@@ -8,15 +8,24 @@
 import Foundation
 
 struct MovieResponse: Decodable{
+    let page: Int
     let results: [Movie]
+    let totalPages: Int
+    let totalResults: Int
 }
 struct Movie: Decodable, Identifiable {
     let id: Int
     let title: String
+    let adult: Bool
     let overview: String
     let posterPath: String
     var posterURL: URL? {
         URL(string: "https://image.tmdb.org/t/p/w400/\(posterPath)")
+    }
+    let voteAverage: Float
+    let backdropPath: String
+    var backdropURL: URL? {
+        URL(string: "https://image.tmdb.org/t/p/w500/\(backdropPath)")
     }
 }
 extension Movie {
@@ -24,8 +33,11 @@ extension Movie {
         Movie(
             id: 507086,
             title: "Jurassic World Dominion",
+            adult: false,
             overview: "Four years after Isla Nublar was destroyed, dinosaurs now live—and hunt—alongside humans all over the world. This fragile balance will reshape the future and determine, once and for all, whether human beings are to remain the apex predators on a planet they now share with history’s most fearsome creatures.",
-            posterPath: "/w4c0GTpmEQ1CZQNHndTv2PPgf2p.jpg"
+            posterPath: "/w4c0GTpmEQ1CZQNHndTv2PPgf2p.jpg",
+            voteAverage: 4.5,
+            backdropPath: "/9eAn20y26wtB3aet7w9lHjuSgZ3.jpg"
         )
     }
 }

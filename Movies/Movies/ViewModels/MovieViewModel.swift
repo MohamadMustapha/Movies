@@ -1,16 +1,12 @@
-//
-//  MovieViewModel.swift
-//  Movies
-//
-//  Created by mohamad mostapha on 14/12/2023.
-//
-
 import Foundation
 
 @MainActor
-class MovieViewModel: ObservableObject{
+class MovieViewModel: ObservableObject {
     
-    private let service = MoviesService()
+    @Published var searchResults: [Movie] = []
+
+    private let trendingService = TrendingMoviesService()
+    private let inCinemaService = CinemaService()
     
     enum State {
         case loading
@@ -19,16 +15,33 @@ class MovieViewModel: ObservableObject{
     }
     
     @Published var state: State = .loading
-
-    func loadMovies() async {
-        do{
-            state = .loading
+    @Published var cinemaState: State = .loading
+    
+    func loadMovies(service: MovieServiceProtocol, completion: @escaping (State) -> Void) async {
+        do {
+            
             let movies = try await service.getMovies()
-            state = .loaded(movies: movies)
+            completion(.loaded(movies: movies))
+        } catch {
+            completion(.error(error))
         }
-        catch{
-            state = .error(error)
+    }
+
+    func loadTrendingMovies() async {
+        await loadMovies(service: trendingService) { newState in
+            self.state = newState
+        }
+    }
+
+    func loadInCinemaMovies() async {
+        await loadMovies(service: inCinemaService) { newState in
+            self.cinemaState = newState
         }
     }
     
+    func search(key: String) async -> [Movie] {
+        searchResults =  try! await trendingService.search(term: key)
+        return searchResults
+    }
+
 }
